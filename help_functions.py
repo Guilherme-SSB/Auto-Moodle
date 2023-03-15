@@ -1,10 +1,7 @@
-import json
 import os
 import platform
 from email.mime.multipart import MIMEMultipart
 
-import pandas as pd
-import requests
 import win32com.client as win32
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException
@@ -61,7 +58,6 @@ def iniciate_chromedriver():
     return driver
 
 
-
 def find_element_by_xpath(driver: webdriver, xpath: str):
     """
     Busca um elemento pelo xpath, com uma tolerância de 5 segundos.
@@ -97,23 +93,6 @@ def check_exists_by_xpath(driver, xpath) -> bool:
         return False
     return True
 
-
-def post_message_to_teams(mensagem: str):
-    """
-    Manda uma mensagem para um canal do Microsoft Teams.
-    
-    Parâmetros
-    ----------
-    mensagem: string com a mensagem a ser enviada.
-    """
-    url_webhook = 'https://brasilcapital.webhook.office.com/webhookb2/342a50e4-4097-4cf2-9c0c-4dfbd28eadfd@16fda5c9-a45b-4197-8583-9418715c8f74/IncomingWebhook/a7fe0c3d3722451aa34863a8bb24926e/94fd217d-dcfb-4028-b36c-1b20a2133aea'
-    headers = {'Content-Type': 'application/json'}
-    payload = {"text": f"\n {mensagem}\n"}
-
-    try:
-        requests.post(url_webhook, headers=headers, data=json.dumps(payload))
-        print('Mensagem no Teams enviado com sucesso')
-    except Exception as e: print(e)
 
 def mandar_email(to, subject, message):
     msg = MIMEMultipart()
