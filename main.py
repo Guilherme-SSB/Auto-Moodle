@@ -90,7 +90,6 @@ def estilizar_tabela_para_email(df: str) -> str:
     return df
 
 
-
 def main():
     
     URL = 'https://imt.myopenlms.net/'
@@ -183,13 +182,13 @@ def main():
         except:
             break
     
-    df_final.to_csv(f'./outputs/tarefas_{TODAY}.csv', index=False)
+    df_final.to_csv(f'{OUTPUTS_DIR}/tarefas_{TODAY}.csv', index=False)
 
     driver.close()
 
     # Gerar relatório
     ## Ler o arquivo com as tarefas do dia
-    df_tarefas_dia = pd.read_csv(f'./outputs/tarefas_{TODAY}.csv')
+    df_tarefas_dia = pd.read_csv(f'{OUTPUTS_DIR}/tarefas_{TODAY}.csv')
 
     ## Filtrar tabelas por status
     df_tarefas_dia_email = df_tarefas_dia[df_tarefas_dia['STATUS'].isin(['Não submetido', 'Sem tentativa'])]
@@ -215,9 +214,20 @@ def main():
         message=mensagem
     )
 
+    ## Atualizar Base_Tarefas_IMT.csv com as tarefas do dia
+    base_tarefas_imt = pd.read_csv(f'{OUTPUTS_DIR}/Base_Tarefas_IMT.csv')
+
+    base_tarefas_imt = pd.concat([base_tarefas_imt, df_tarefas_dia], ignore_index=True)
+    base_tarefas_imt.drop_duplicates(inplace=True)
+
+    base_tarefas_imt.to_csv(f'{OUTPUTS_DIR}/Base_Tarefas_IMT.csv', index=False)
+
+
 
 if __name__ == '__main__':
     clean_screen()
+
+    OUTPUTS_DIR = 'D:/GitHub/Auto Moodle/outputs'
 
     load_dotenv()
     IMT_EMAIL = str(os.getenv('IMT_EMAIL'))
