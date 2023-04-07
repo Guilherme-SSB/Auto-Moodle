@@ -157,7 +157,7 @@ def main():
             status = clear_string(find_element_by_xpath(driver, xpath_tarefa+'/div[2]/span/div/a').text)
 
             # Se a materia for ECM307-Sistemas e Sinais, pula
-            if (materia == 'ECM307-Sistemas e Sinais') or (materia == 'ECM401-Banco de Dados'):
+            if (materia == 'ECM307-Sistemas e Sinais') or (materia == 'ECM401-Banco de Dados') or (materia == 'ECM971-Devops: Metodologia de Desenvolvimento de Software'):
                 i += 1
                 continue
             
