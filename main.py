@@ -182,13 +182,14 @@ def main():
         except:
             break
     
-    df_final.to_csv(f'{OUTPUTS_DIR}/tarefas_{TODAY}.csv', index=False)
+    # df_final.to_csv(f'{OUTPUTS_DIR}/tarefas_{TODAY}.csv', index=False)
 
     driver.close()
 
     # Gerar relatório
     ## Ler o arquivo com as tarefas do dia
-    df_tarefas_dia = pd.read_csv(f'{OUTPUTS_DIR}/tarefas_{TODAY}.csv')
+    # df_tarefas_dia = pd.read_csv(f'{OUTPUTS_DIR}/tarefas_{TODAY}.csv')
+    df_tarefas_dia = df_final
 
     ## Filtrar tabelas por status
     df_tarefas_dia_email = df_tarefas_dia[df_tarefas_dia['STATUS'].isin(['Não submetido', 'Sem tentativa'])]
