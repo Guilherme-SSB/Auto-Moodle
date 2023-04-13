@@ -210,7 +210,7 @@ def main():
 
     # Enviar email
     mandar_email(
-        to='gui.samuel10@gmail.com',
+        to="'gui.samuel10@gmail.com';'renanreschke@hotmail.com';'igor-eiki@hotmail.com'",
         subject=f'[IMT Tarefas] Tarefas Moodle - {TODAY_FORMATADO}',
         message=mensagem
     )
