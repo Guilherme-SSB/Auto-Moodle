@@ -150,11 +150,11 @@ def main():
     while True:
         try:
             xpath_tarefa = f'/html/body/nav/div/div[1]/div/section[1]/snap-feed/div/div[{i}]'
-            nome = clear_string(find_element_by_xpath(driver, xpath_tarefa+'/div[2]/a/h3').text)
-            materia = clear_string(find_element_by_xpath(driver, xpath_tarefa+'/div[2]/a/h3/small').text)
-            link = clear_string(find_element_by_xpath(driver, xpath_tarefa+'/div[2]/a').get_attribute('href'))
-            data_entrega = formatar_data_entrega(clear_string(find_element_by_xpath(driver, xpath_tarefa+'/div[2]/span/time').text))
-            status = clear_string(find_element_by_xpath(driver, xpath_tarefa+'/div[2]/span/div/a').text)
+            nome = clear_string(find_element_by_xpath(driver, xpath_tarefa+'/div/a/h3').text)
+            materia = clear_string(find_element_by_xpath(driver, xpath_tarefa+'/div/a/h3/small').text)
+            link = clear_string(find_element_by_xpath(driver, xpath_tarefa+'/div/a').get_attribute('href'))
+            data_entrega = formatar_data_entrega(clear_string(find_element_by_xpath(driver, xpath_tarefa+'/div/span/time').text))
+            status = clear_string(find_element_by_xpath(driver, xpath_tarefa+'/div/span/div/a').text)
 
             # Se a materia for ECM307-Sistemas e Sinais, pula
             if (materia == 'ECM307-Sistemas e Sinais') or (materia == 'ECM401-Banco de Dados') or (materia == 'ECM971-Devops: Metodologia de Desenvolvimento de Software'):
@@ -210,7 +210,8 @@ def main():
 
     # Enviar email
     mandar_email(
-        to="'gui.samuel10@gmail.com';'renanreschke@hotmail.com';'igor-eiki@hotmail.com'",
+        # to="'gui.samuel10@gmail.com';'renanreschke@hotmail.com';'igor-eiki@hotmail.com'",
+        to="gui.samuel10@gmail.com",
         subject=f'[IMT Tarefas] Tarefas Moodle - {TODAY_FORMATADO}',
         message=mensagem
     )
