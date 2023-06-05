@@ -3,6 +3,8 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=windows,visualstudiocode,python
 
 outputs/
+credentials/
+test.py
 
 ### Python ###
 # Byte-compiled / optimized / DLL files

@@ -11,6 +11,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from webdriver_manager.chrome import ChromeDriverManager
 
+import google_helper as gh
+
 
 def clean_screen():
     """
@@ -22,9 +24,6 @@ def clean_screen():
 def iniciate_chromedriver() -> webdriver:
     options = webdriver.ChromeOptions()
     options.add_argument("--incognito")
-    # options.add_argument('--ignore-certificate-errors')
-    # options.add_argument("--headless")
-    # options.add_argument("--disable-gpu")
     
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
     driver.maximize_window()
@@ -105,3 +104,81 @@ def mandar_email(to, subject, message):
     mail.HtmlBody = message
     mail.Display(False)
     mail.Send()
+
+def create_google_events(df_tarefas_to_do, df_tarefas_done):
+    svc = gh.create_service()
+
+    events_todo = []
+    for index, row in df_tarefas_to_do.iterrows():
+        event = {
+            'summary': row['NOME'],
+            'location': 'Moodle',
+            'description': f'Matéria: {row["MATÉRIA"]}\nStatus: {row["STATUS"]}\nLink: {row["LINK"]}',
+            'start': {
+                'dateTime': row['DATA ENTREGA'].strftime('%Y-%m-%dT%H:%M:%S'),
+                'timeZone': 'America/Sao_Paulo',
+            },
+            'end': {
+                'dateTime': row['DATA ENTREGA'].strftime('%Y-%m-%dT%H:%M:%S'),
+                'timeZone': 'America/Sao_Paulo',
+            },
+            'reminders': {
+                'useDefault': False,
+                'overrides': [
+                    {'method': 'popup', 'minutes': 180},
+                ],
+            },
+            'colorId': 11,
+        }
+        events_todo.append(event)
+    
+    for event in events_todo:
+        existing_events = svc.events().list(calendarId='primary', q=event['summary']).execute()['items']
+
+        if len(existing_events) == 0:
+            try:
+                ev = svc.events().insert(calendarId='primary', body=event).execute()
+                print(f'Event created: {ev.get("htmlLink")}')
+            except Exception as e:
+                print(e)
+                print(f'Failed to create event: {event["summary"]}')
+        else:
+            try:
+                ev = svc.events().update(calendarId='primary', eventId=existing_events[0]['id'], body=event).execute()
+                print(f'Event updated: {event["summary"]}')
+            except Exception as e:
+                print(e)
+                print(f'Failed to update event: {event["summary"]}')
+
+    events_done = []
+    for index, row in df_tarefas_done.iterrows():
+        event = {
+            'summary': row['NOME'],
+            'location': 'Moodle',
+            'description': f'Matéria: {row["MATÉRIA"]}\nStatus: {row["STATUS"]}\nLink: {row["LINK"]}',
+            'start': {
+                'dateTime': row['DATA ENTREGA'].strftime('%Y-%m-%dT%H:%M:%S'),
+                'timeZone': 'America/Sao_Paulo',
+            },
+            'end': {
+                'dateTime': row['DATA ENTREGA'].strftime('%Y-%m-%dT%H:%M:%S'),
+                'timeZone': 'America/Sao_Paulo',
+            },
+            'reminders': {
+                'useDefault': False,
+                'overrides': [],
+            },
+            'colorId': 10,
+        }
+        events_done.append(event)
+
+    for event in events_done:
+        existing_events = svc.events().list(calendarId='primary', q=event['summary']).execute()['items']
+
+        if len(existing_events) > 0:
+            try:
+                ev = svc.events().update(calendarId='primary', eventId=existing_events[0]['id'], body=event).execute()
+                print(f'Event updated: {event["summary"]}')
+            except Exception as e:
+                print(e)
+                print(f'Failed to update event: {event["summary"]}')
