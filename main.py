@@ -5,8 +5,10 @@ import time
 import pandas as pd
 from dotenv import load_dotenv
 
-from help_functions import (clean_screen, find_element_by_xpath,
-                            iniciate_chromedriver, mandar_email)
+from help_functions import (clean_screen, find_element_by_xpath, 
+                            iniciate_chromedriver, mandar_email, 
+                            create_google_events)
+
 
 TODAY = datetime.datetime.now().date()
 TODAY_FORMATADO = TODAY.strftime('%d/%m/%Y')
@@ -157,7 +159,8 @@ def main():
             status = clear_string(find_element_by_xpath(driver, xpath_tarefa+'/div/span/div/a').text)
 
             # Se a materia for ECM307-Sistemas e Sinais, pula
-            if (materia == 'ECM307-Sistemas e Sinais') or (materia == 'ECM401-Banco de Dados') or (materia == 'ECM971-Devops: Metodologia de Desenvolvimento de Software'):
+            materias_to_ignore = ['ECM307-Sistemas e Sinais', 'ECM401-Banco de Dados', 'ECM971-Devops: Metodologia de Desenvolvimento de Software', 'Estágio Supervisionado - 2023']
+            if materia in materias_to_ignore:
                 i += 1
                 continue
             
@@ -181,40 +184,39 @@ def main():
             i += 1
         except:
             break
-    
-    # df_final.to_csv(f'{OUTPUTS_DIR}/tarefas_{TODAY}.csv', index=False)
 
     driver.close()
 
     # Gerar relatório
-    ## Ler o arquivo com as tarefas do dia
-    # df_tarefas_dia = pd.read_csv(f'{OUTPUTS_DIR}/tarefas_{TODAY}.csv')
     df_tarefas_dia = df_final
 
     ## Filtrar tabelas por status
-    df_tarefas_dia_email = df_tarefas_dia[df_tarefas_dia['STATUS'].isin(['Não submetido', 'Sem tentativa'])]
-
-    ## Criar e-mail
-    df_tarefas_dia_email.sort_values(by=['DATA ENTREGA'], inplace=True)
-    df_tarefas_dia_email['DATA ENTREGA'] = df_tarefas_dia_email['DATA ENTREGA'].astype('datetime64[ns]')
-    df_tarefas_dia_email['DATA ENTREGA'] = df_tarefas_dia_email['DATA ENTREGA'].dt.strftime('%d/%m/%Y %H:%M')
-
-    df_tarefas_dia_email = df_tarefas_dia_email.to_html(index=False)
-    df_tarefas_dia_email = estilizar_tabela_para_email(df_tarefas_dia_email)
+    df_tarefas_dia.sort_values(by=['DATA ENTREGA'], inplace=True)
+    
+    df_tarefas_dia['DATA ENTREGA'] = pd.to_datetime(df_tarefas_dia['DATA ENTREGA'], format='%Y-%m-%d %H:%M')
+    df_tarefas_todo = df_tarefas_dia[df_tarefas_dia['STATUS'].isin(['Não submetido', 'Sem tentativa'])]
+    df_tarefas_done = df_tarefas_dia[~df_tarefas_dia['STATUS'].isin(['Não submetido', 'Sem tentativa'])]
+    
+    df_tarefas_todo_email = df_tarefas_todo.copy()
+    df_tarefas_todo_email['DATA ENTREGA'] = df_tarefas_todo_email['DATA ENTREGA'].dt.strftime('%d/%m/%Y %H:%M')
+    df_tarefas_todo_email = df_tarefas_todo_email.to_html(index=False)
+    df_tarefas_todo_email = estilizar_tabela_para_email(df_tarefas_todo_email)
 
     mensagem = f'''
-                <h3>Olá, Gui!</h3>
+                <h3>Olá, Renan!</h3>
                 <p>Estas são próximas tarefas a serem entregues</p>
-                <p>{df_tarefas_dia_email}</p>
+                <p>{df_tarefas_todo_email}</p>
             '''
 
     # Enviar email
     mandar_email(
-        # to="'gui.samuel10@gmail.com';'renanreschke@hotmail.com';'igor-eiki@hotmail.com'",
-        to="gui.samuel10@gmail.com",
+        to="renanreschke@hotmail.com",
         subject=f'[IMT Tarefas] Tarefas Moodle - {TODAY_FORMATADO}',
         message=mensagem
     )
+
+    # Criar eventos no Google Calendar
+    create_google_events(df_tarefas_todo, df_tarefas_done)
 
     ## Atualizar Base_Tarefas_IMT.csv com as tarefas do dia
     base_tarefas_imt = pd.read_csv(f'{OUTPUTS_DIR}/Base_Tarefas_IMT.csv')
@@ -229,7 +231,7 @@ def main():
 if __name__ == '__main__':
     clean_screen()
 
-    OUTPUTS_DIR = 'D:/GitHub/Auto Moodle/outputs'
+    OUTPUTS_DIR = 'C:/Git/Auto-Moodle/outputs'
 
     load_dotenv()
     IMT_EMAIL = str(os.getenv('IMT_EMAIL'))
