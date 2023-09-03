@@ -203,28 +203,28 @@ def main():
     df_tarefas_todo_email = estilizar_tabela_para_email(df_tarefas_todo_email)
 
     mensagem = f'''
-                <h3>Olá, Renan!</h3>
+                <h3>Olá, Gui!</h3>
                 <p>Estas são próximas tarefas a serem entregues</p>
                 <p>{df_tarefas_todo_email}</p>
             '''
 
     # Enviar email
     mandar_email(
-        to="renanreschke@hotmail.com",
+        to="gui.samuel10@gmail.com",
         subject=f'[IMT Tarefas] Tarefas Moodle - {TODAY_FORMATADO}',
         message=mensagem
     )
 
-    # Criar eventos no Google Calendar
-    create_google_events(df_tarefas_todo, df_tarefas_done)
+    # # Criar eventos no Google Calendar
+    # create_google_events(df_tarefas_todo, df_tarefas_done)
 
-    ## Atualizar Base_Tarefas_IMT.csv com as tarefas do dia
-    base_tarefas_imt = pd.read_csv(f'{OUTPUTS_DIR}/Base_Tarefas_IMT.csv')
+    # ## Atualizar Base_Tarefas_IMT.csv com as tarefas do dia
+    # base_tarefas_imt = pd.read_csv(f'{OUTPUTS_DIR}/Base_Tarefas_IMT.csv')
 
-    base_tarefas_imt = pd.concat([base_tarefas_imt, df_tarefas_dia], ignore_index=True)
-    base_tarefas_imt.drop_duplicates(inplace=True)
+    # base_tarefas_imt = pd.concat([base_tarefas_imt, df_tarefas_dia], ignore_index=True)
+    # base_tarefas_imt.drop_duplicates(inplace=True)
 
-    base_tarefas_imt.to_csv(f'{OUTPUTS_DIR}/Base_Tarefas_IMT.csv', index=False)
+    # base_tarefas_imt.to_csv(f'{OUTPUTS_DIR}/Base_Tarefas_IMT.csv', index=False)
 
 
 
